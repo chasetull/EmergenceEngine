@@ -1,0 +1,7 @@
+start empty dir:
+'npm create vite@latest frontend -- --template react-ts'
+
+*if error, update npm:*
+'nvm install 22'
+'nvm use 22'
+'echo "22" > .nvmrc'
