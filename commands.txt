@@ -1,7 +1,10 @@
-start empty dir:
+*TO start empty dir with frontend:*
 'npm create vite@latest frontend -- --template react-ts'
 
 *if error, update npm:*
 'nvm install 22'
 'nvm use 22'
 'echo "22" > .nvmrc'
+
+*to start app:*
+from /frontend : 'npm run dev'

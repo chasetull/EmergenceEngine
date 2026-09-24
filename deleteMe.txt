@@ -1,0 +1,12 @@
+src/
+├── components/
+│   ├── FibonacciCanvas.tsx
+│   └── FibonacciMetrics.tsx
+│
+├── math/
+│   └── fibonacci.ts
+│
+├── App.tsx
+├── App.css
+├── index.css
+└── main.tsx

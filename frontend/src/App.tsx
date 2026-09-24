@@ -1,122 +1,104 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
+
+import {
+  fibonacci,
+  fibonacciRatio,
+  phiDelta,
+  PHI,
+} from "./math/fibonacci";
+
+// const PHI = (1 + Math.sqrt(5)) / 2;
+
+// function fibonacci(count: number): number[] {
+//   if (count <= 0) return [];
+//   if (count === 1) return [1];
+
+//   const sequence = [1, 1];
+
+//   for (let i = 2; i < count; i++) {
+//     sequence.push(sequence[i - 1] + sequence[i - 2]);
+//   }
+
+//   return sequence;
+// }
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [iterations, setIterations] = useState(12);
+
+  const sequence = fibonacci(iterations);
+  const current = sequence[sequence.length - 1];
+  //const previous = sequence[sequence.length - 2];
+
+  // const ratio =
+  //   previous !== undefined ? current / previous : 1;
+
+  // const delta = Math.abs(PHI - ratio);
+  const ratio = fibonacciRatio(sequence);
+  const delta = phiDelta(ratio);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
+    <main className="engine">
+      <header>
+        <p className="eyebrow">EMERGENCE ENGINE / 01</p>
+        <h1>Fibonacci</h1>
+        <p className="subtitle">
+          Order emerging from recursion.
+        </p>
+      </header>
+
+      <section className="sequence">
+        {sequence.map((number, index) => (
+          <span key={index}>{number}</span>
+        ))}
+      </section>
+
+      <section className="metrics">
         <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
+          <label>ITERATION</label>
+          <strong>{iterations}</strong>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        <div>
+          <label>F(n)</label>
+          <strong>{current}</strong>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+
+        <div>
+          <label>F(n) / F(n-1)</label>
+          <strong>{ratio.toFixed(8)}</strong>
+        </div>
+
+        <div>
+          <label>φ</label>
+          <strong>{PHI.toFixed(8)}</strong>
+        </div>
+
+        <div>
+          <label>DELTA</label>
+          <strong>{delta.toFixed(8)}</strong>
         </div>
       </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <section className="controls">
+        <label htmlFor="iterations">
+          ITERATIONS
+          <span>{iterations}</span>
+        </label>
+
+        <input
+          id="iterations"
+          type="range"
+          min="2"
+          max="30"
+          value={iterations}
+          onChange={(event) =>
+            setIterations(Number(event.target.value))
+          }
+        />
+      </section>
+    </main>
+  );
 }
 
-export default App
+export default App;
