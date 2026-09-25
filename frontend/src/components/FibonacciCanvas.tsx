@@ -4,33 +4,67 @@ interface FibonacciCanvasProps {
   sequence: number[];
 }
 
+// interface Square {
+//   x: number;
+//   y: number;
+//   size: number;
+//   value: number;
+// }
+
+
+type Direction = "start" | "down" | "left" | "up" | "right";
+
 interface Square {
   x: number;
   y: number;
   size: number;
   value: number;
+  direction: Direction;
 }
+
+
 
 function buildSquares(sequence: number[]): Square[] {
   if (sequence.length === 0) return [];
 
+  // const squares: Square[] = [
+  //   {
+  //     x: 0,
+  //     y: 0,
+  //     size: sequence[0],
+  //     value: sequence[0],
+  //   },
+  // ];
+
+  // if (sequence.length === 1) return squares;
+
+  // // Second 1 sits directly to the right.
+  // squares.push({
+  //   x: sequence[0],
+  //   y: 0,
+  //   size: sequence[1],
+  //   value: sequence[1],
+  // });
+
+
   const squares: Square[] = [
-    {
-      x: 0,
-      y: 0,
-      size: sequence[0],
-      value: sequence[0],
-    },
+  {
+    x: 0,
+    y: 0,
+    size: sequence[0],
+    value: sequence[0],
+    direction: "start",
+  },
   ];
 
   if (sequence.length === 1) return squares;
 
-  // Second 1 sits directly to the right.
   squares.push({
     x: sequence[0],
     y: 0,
     size: sequence[1],
     value: sequence[1],
+    direction: "right",
   });
 
   let minX = 0;
@@ -43,28 +77,39 @@ function buildSquares(sequence: number[]): Square[] {
 
     // Placement rotates:
     // down → left → up → right
-    const direction = (i - 2) % 4;
+    // const direction = (i - 2) % 4;
+
+    const directionIndex = (i - 2) % 4;
+
+    const directions: Direction[] = [
+      "down",
+      "left",
+      "up",
+      "right",
+    ];
+
+    const direction = directions[directionIndex];
 
     let x = 0;
     let y = 0;
 
     switch (direction) {
-      case 0: // down
+      case "down":
         x = minX;
         y = maxY;
         break;
 
-      case 1: // left
+      case "left":
         x = minX - size;
         y = minY;
         break;
 
-      case 2: // up
+      case "up":
         x = minX;
         y = minY - size;
         break;
 
-      case 3: // right
+      case "right":
         x = maxX;
         y = minY;
         break;
@@ -75,6 +120,7 @@ function buildSquares(sequence: number[]): Square[] {
       y,
       size,
       value: size,
+      direction,
     });
 
     minX = Math.min(minX, x);
@@ -167,6 +213,77 @@ export default function FibonacciCanvas({
           y + size / 2
         );
       }
+
+      
+
+      ctx.beginPath();
+      ctx.strokeStyle = "#eeeeee";
+      ctx.lineWidth = 2;
+
+      squares.forEach((square, index) => {
+        const x = square.x * scale + offsetX;
+        const y = square.y * scale + offsetY;
+        const size = square.size * scale;
+
+        let centerX = 0;
+        let centerY = 0;
+        let startAngle = 0;
+        let endAngle = 0;
+
+        // The first two 1x1 squares establish the beginning
+        // of the spiral.
+        if (index === 0) {
+          centerX = x + size;
+          centerY = y + size;
+          startAngle = Math.PI;
+          endAngle = Math.PI * 1.5;
+        } else if (index === 1) {
+          centerX = x;
+          centerY = y + size;
+          startAngle = Math.PI * 1.5;
+          endAngle = Math.PI * 2;
+        } else {
+          switch (square.direction) {
+            case "down":
+              centerX = x;
+              centerY = y;
+              startAngle = 0;
+              endAngle = Math.PI / 2;
+              break;
+
+            case "left":
+              centerX = x + size;
+              centerY = y;
+              startAngle = Math.PI / 2;
+              endAngle = Math.PI;
+              break;
+
+            case "up":
+              centerX = x + size;
+              centerY = y + size;
+              startAngle = Math.PI;
+              endAngle = Math.PI * 1.5;
+              break;
+
+            case "right":
+              centerX = x;
+              centerY = y + size;
+              startAngle = Math.PI * 1.5;
+              endAngle = Math.PI * 2;
+              break;
+          }
+        }
+
+        ctx.arc(
+          centerX,
+          centerY,
+          size,
+          startAngle,
+          endAngle
+        );
+      });
+
+      ctx.stroke();
     });
   }, [sequence]);
 
