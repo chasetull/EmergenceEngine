@@ -15,8 +15,12 @@ type Experiment = "fibonacci" | "dual";
 
 function App() {
   const [iterations, setIterations] = useState(12);
+  const [showPhiInfo, setShowPhiInfo] = useState(true); // info testr
   const [experiment, setExperiment] =
     useState<Experiment>("fibonacci");
+
+  const [relationship, setRelationship] =
+    useState<"mirror" | "phi">("mirror");
 
   const sequence = fibonacci(iterations);
   const current = sequence[sequence.length - 1];
@@ -54,7 +58,95 @@ function App() {
       {experiment === "fibonacci" ? (
         <FibonacciCanvas sequence={sequence} />
       ) : (
-        <DualFibonacciCanvas sequence={sequence} />
+        <DualFibonacciCanvas
+          sequence={sequence}
+          relationship={relationship}
+        />
+      )}
+      {experiment === "dual" && (
+        <section className="relationship-controls">
+          <p>RELATIONSHIP</p>
+
+          <div>
+            <button
+              className={
+                relationship === "mirror" ? "active" : ""
+              }
+              onClick={() => setRelationship("mirror")}
+            >
+              MIRROR
+              <span>L(n) → R(n)</span>
+            </button>
+
+            <button
+              className={relationship === "phi" ? "active" : ""}
+              onClick={() => {
+                setRelationship("phi");
+                setShowPhiInfo(true);
+              }}
+            >
+              PHI OFFSET
+              <span>L(n) → R(n+1)</span>
+            </button>
+            {experiment === "dual" &&
+              relationship === "phi" &&
+              showPhiInfo && (
+                <section className="phi-info">
+                  <button
+                    className="phi-info-close"
+                    onClick={() => setShowPhiInfo(false)}
+                    aria-label="Close Phi Offset explanation"
+                  >
+                    ×
+                  </button>
+
+                  <div className="phi-info-heading">
+                    <span>RELATIONSHIP / PHI OFFSET</span>
+                    <strong>φ</strong>
+                  </div>
+
+                  <div className="phi-info-content">
+                    <div className="phi-info-description">
+                      <p>
+                        Instead of connecting matching Fibonacci
+                        iterations, Phi Offset connects each point on the
+                        left spiral to the next Fibonacci point on the
+                        right.
+                      </p>
+
+                      <div className="phi-equation">
+                        L(n) → R(n + 1)
+                      </div>
+
+                      <p>
+                        This means each bridge connects two consecutive
+                        Fibonacci numbers. As the sequence grows, the
+                        ratio between those numbers approaches the golden
+                        ratio.
+                      </p>
+                    </div>
+
+                    <div className="phi-info-math">
+                      <div>
+                        <label>RELATIONSHIP</label>
+                        <span>F(n + 1) / F(n)</span>
+                      </div>
+
+                      <div>
+                        <label>CONVERGES TO</label>
+                        <span>φ</span>
+                      </div>
+
+                      <div>
+                        <label>GOLDEN RATIO</label>
+                        <span>1.6180339887...</span>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              )}
+          </div>
+        </section>
       )}
 
       <section className="sequence">

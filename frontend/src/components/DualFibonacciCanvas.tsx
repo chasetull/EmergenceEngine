@@ -1,7 +1,17 @@
 import { useEffect, useRef } from "react";
 
+type Relationship = "mirror" | "phi";
+
 interface DualFibonacciCanvasProps {
   sequence: number[];
+  relationship: Relationship;
+}
+
+interface Point {
+  x: number;
+  y: number;
+  value: number;
+  index: number;
 }
 
 interface Square {
@@ -83,12 +93,15 @@ function drawSpiral(
   scale: number,
   offsetX: number,
   offsetY: number
-) {
+): Point[] {
+  const points: Point[] = [];
+
   squares.forEach((square, index) => {
     const x = square.x * scale + offsetX;
     const y = square.y * scale + offsetY;
     const size = square.size * scale;
 
+    // Draw square
     ctx.strokeStyle = "#333";
     ctx.lineWidth = 1;
     ctx.strokeRect(x, y, size, size);
@@ -142,9 +155,11 @@ function drawSpiral(
       }
     }
 
+    // Draw spiral arc
     ctx.beginPath();
     ctx.strokeStyle = "#eeeeee";
     ctx.lineWidth = 2;
+
     ctx.arc(
       centerX,
       centerY,
@@ -152,12 +167,32 @@ function drawSpiral(
       startAngle,
       endAngle
     );
+
     ctx.stroke();
+
+    // Find midpoint of this arc.
+    const midAngle = (startAngle + endAngle) / 2;
+
+    const pointX =
+      centerX + Math.cos(midAngle) * size;
+
+    const pointY =
+      centerY + Math.sin(midAngle) * size;
+
+    points.push({
+      x: pointX,
+      y: pointY,
+      value: square.value,
+      index,
+    });
   });
+
+  return points;
 }
 
 export default function DualFibonacciCanvas({
   sequence,
+  relationship,
 }: DualFibonacciCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -222,12 +257,12 @@ export default function DualFibonacciCanvas({
      */
     ctx.save();
 
-    drawSpiral(
-      ctx,
-      squares,
-      scale,
-      localX,
-      localY
+    const leftPoints = drawSpiral(
+        ctx,
+        squares,
+        scale,
+        localX,
+        localY
     );
 
     ctx.restore();
@@ -242,13 +277,78 @@ export default function DualFibonacciCanvas({
     ctx.translate(width, 0);
     ctx.scale(-1, 1);
 
-    drawSpiral(
-      ctx,
-      squares,
-      scale,
-      localX,
-      localY
+    const rawRightPoints = drawSpiral(
+        ctx,
+        squares,
+        scale,
+        localX,
+        localY
     );
+
+    ctx.restore();
+
+    const rightPoints = rawRightPoints.map((point) => ({
+        ...point,
+        x: width - point.x,
+    }));
+
+    ctx.save();
+
+    leftPoints.forEach((leftPoint, index) => {
+    let rightPoint: Point | undefined;
+
+    if (relationship === "mirror") {
+        rightPoint = rightPoints[index];
+    }
+
+    if (relationship === "phi") {
+        rightPoint = rightPoints[index + 1];
+    }
+
+    if (!rightPoint) return;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        leftPoint.x,
+        leftPoint.y
+    );
+
+    ctx.lineTo(
+        rightPoint.x,
+        rightPoint.y
+    );
+
+    ctx.strokeStyle = "rgba(238, 238, 238, 0.16)";
+    ctx.lineWidth = 1;
+
+    ctx.stroke();
+
+    // Left node
+    ctx.beginPath();
+    ctx.arc(
+        leftPoint.x,
+        leftPoint.y,
+        2.5,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fillStyle = "#aaa";
+    ctx.fill();
+
+    // Right node
+    ctx.beginPath();
+    ctx.arc(
+        rightPoint.x,
+        rightPoint.y,
+        2.5,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+    });
 
     ctx.restore();
 
@@ -261,7 +361,7 @@ export default function DualFibonacciCanvas({
     ctx.moveTo(width / 2, 30);
     ctx.lineTo(width / 2, height - 30);
     ctx.stroke();
-  }, [sequence]);
+  }, [sequence, relationship]);
 
   return (
     <div className="fibonacci-canvas-container">
