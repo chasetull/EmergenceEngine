@@ -2,6 +2,8 @@ import { useState } from "react";
 import "./App.css";
 import FibonacciCanvas from "./components/FibonacciCanvas";
 
+import DualFibonacciCanvas from "./components/DualFibonacciCanvas";
+
 import {
   fibonacci,
   fibonacciRatio,
@@ -9,32 +11,15 @@ import {
   PHI,
 } from "./math/fibonacci";
 
-// const PHI = (1 + Math.sqrt(5)) / 2;
-
-// function fibonacci(count: number): number[] {
-//   if (count <= 0) return [];
-//   if (count === 1) return [1];
-
-//   const sequence = [1, 1];
-
-//   for (let i = 2; i < count; i++) {
-//     sequence.push(sequence[i - 1] + sequence[i - 2]);
-//   }
-
-//   return sequence;
-// }
+type Experiment = "fibonacci" | "dual";
 
 function App() {
   const [iterations, setIterations] = useState(12);
+  const [experiment, setExperiment] =
+    useState<Experiment>("fibonacci");
 
   const sequence = fibonacci(iterations);
   const current = sequence[sequence.length - 1];
-  //const previous = sequence[sequence.length - 2];
-
-  // const ratio =
-  //   previous !== undefined ? current / previous : 1;
-
-  // const delta = Math.abs(PHI - ratio);
   const ratio = fibonacciRatio(sequence);
   const delta = phiDelta(ratio);
 
@@ -48,7 +33,29 @@ function App() {
         </p>
       </header>
 
-      <FibonacciCanvas sequence={sequence} />
+      <nav className="experiment-tabs">
+        <button
+          className={
+            experiment === "fibonacci" ? "active" : ""
+          }
+          onClick={() => setExperiment("fibonacci")}
+        >
+          01 / SINGLE
+        </button>
+
+        <button
+          className={experiment === "dual" ? "active" : ""}
+          onClick={() => setExperiment("dual")}
+        >
+          02 / DUAL
+        </button>
+      </nav>
+
+      {experiment === "fibonacci" ? (
+        <FibonacciCanvas sequence={sequence} />
+      ) : (
+        <DualFibonacciCanvas sequence={sequence} />
+      )}
 
       <section className="sequence">
         {sequence.map((number, index) => (
