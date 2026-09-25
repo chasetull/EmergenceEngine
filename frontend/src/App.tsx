@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./App.css";
+import FibonacciCanvas from "./components/FibonacciCanvas";
 
 import {
   fibonacci,
@@ -46,6 +47,8 @@ function App() {
           Order emerging from recursion.
         </p>
       </header>
+
+      <FibonacciCanvas sequence={sequence} />
 
       <section className="sequence">
         {sequence.map((number, index) => (

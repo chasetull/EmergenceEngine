@@ -1,3 +1,5 @@
+//*  This is a dev file used to notate commands  *\\
+
 *TO start empty dir with frontend:*
 'npm create vite@latest frontend -- --template react-ts'
 
